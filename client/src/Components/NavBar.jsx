@@ -18,7 +18,7 @@ import SearchBar from './SearchBar'
 import FilterCategory from './FilterCategory'
 import { Container } from '@mui/system';
 import { useDispatch, useSelector } from 'react-redux';
-import { GETPRODUCTS,SEARCHBYCATEGORY,VERIFYADMIN } from '../Redux/actions';
+import { GETPRODUCTS,GETWISHLIST,SEARCHBYCATEGORY,VERIFYADMIN } from '../Redux/actions';
 import { AdminPanelSettings, CategoryOutlined, ConfirmationNumberOutlined, VpnKeyOutlined, DashboardOutlined } from '@mui/icons-material';
 import StarIcon from '@mui/icons-material/Star';
 import axios from 'axios'
@@ -29,6 +29,7 @@ import Cookie from 'js-cookie'
 import {api} from '../Redux/actions'
 import swal from 'sweetalert';
 import WishList from './WishList'
+import HomeIcon from '@mui/icons-material/Home';
 
 const logo=require('./3TECH.png')
 
@@ -53,7 +54,7 @@ export default function PrimarySearchAppBar({isAuthenticated}) {
   const dispatch=useDispatch()
   const navigate=useNavigate()
   const [logged,setLogged]=React.useState(false)
-
+  let usuario=useSelector((state)=>state.rootReducer.usuario)
 
   React.useEffect(()=>{
     dispatch(VERIFYADMIN())
@@ -96,7 +97,17 @@ export default function PrimarySearchAppBar({isAuthenticated}) {
       onClose={handleMenuClose}
     >
 
-      {isAuthenticated&&<ListItem    /// IR A MI PERFIL
+
+        <ListItem   //HOME
+          button
+          onClick={ () => navigate('/home') }>
+          <ListItemIcon>
+              <HomeIcon />
+          </ListItemIcon>
+          <ListItemText primary={'Home'} />
+        </ListItem>
+
+      {usuario.correo&&<ListItem    /// IR A MI PERFIL
           button
           onClick={ () => navigate('/profile') }>
           <ListItemIcon>
@@ -105,13 +116,23 @@ export default function PrimarySearchAppBar({isAuthenticated}) {
           <ListItemText primary={'Mi perfil'} />
         </ListItem>}
 
+        {(usuario.rol)?.includes('ADMIN')&&<ListItem   //DASHBOARD
+          button
+          onClick={ () => navigate('/admin') }>
+          <ListItemIcon>
+              <DashboardOutlined />
+          </ListItemIcon>
+          <ListItemText primary={'Administración'} />
+        </ListItem>}
 
-        {isAuthenticated&&<ListItem //BOTON SALIR LOGOUT
+
+        {usuario.correo&&<ListItem //BOTON SALIR LOGOUT
           button
           onClick={ () => {
-            Cookie.set('user',JSON.stringify([]))//pone en blanco al usuario n cookies
+            //Cookie.set('user',JSON.stringify([]))//pone en blanco al usuario n cookies
             Cookie.remove('token')
-            // logout({ returnTo: window.location.origin })
+            dispatch(GETWISHLIST())
+            navigate('/')
           }}>
           <ListItemIcon>
               <VpnKeyOutlined/>
@@ -168,7 +189,7 @@ export default function PrimarySearchAppBar({isAuthenticated}) {
                     {<WishList/>}
                     {/* BOTON DE LOGIN O DE CUENTA */}
                   <Box sx={{ display: { md: 'flex' } }}>
-                    {isAuthenticated?
+                    {usuario.correo?
                     //SI ESTA LOGEADO , BOTON DE CUENTA DE USUARIO
                     <IconButton
                       size="large"
@@ -179,11 +200,13 @@ export default function PrimarySearchAppBar({isAuthenticated}) {
                       onClick={handleProfileMenuOpen}
                       color="inherit"
                     >
-                      {/* <Avatar alt={user?.name} src={user?.avatar||user?.picture} /> */}
+                      { <Avatar alt={usuario?.nombre} src={usuario?.img||usuario?.picture} /> }
                     </IconButton>
                     :
                     // SINO ESTA LOGEADO, BOTON PARA LOGIN
-                    <Button sx={{bgcolor:'blue',color:'black',ml:2}} onClick={()=>navigate('/')}>
+                    <Button sx={{bgcolor:'blue',color:'black',ml:2}} onClick={()=>
+                    (dispatch(GETWISHLIST())).then(navigate('/'))
+                    }>
                       Login
                     </Button>}
                   </Box>

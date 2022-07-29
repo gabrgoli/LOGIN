@@ -40,7 +40,7 @@ const DashboardPage = () => {
 
     let lowInventory = products?.filter((p)=> p.stock<10)
     let productsWithNoInventory = products?.filter((p)=> p.stock===0)
-    let cantidadDePreguntasSinRespuesta = questions?.filter((question)=>question.replies.length===0)
+
 
 
 
@@ -52,7 +52,7 @@ const DashboardPage = () => {
       <NavBar/>
 
       {/* {products[0]&&orders[0]&&users[0]&&questions[0]? */}
-      {products[0]&&users[0]?
+      {products[0]||users.suarios[0]?
       <>
           <Box display="flex" flexDirection='row' justifyContent='space-between'    mt={15}>
                 <Box>
@@ -73,7 +73,7 @@ const DashboardPage = () => {
         <Grid container spacing={2}>
 
             <CardDashboard 
-                link='orderstable'
+              //  link='orderstable'
                 title={ 4 }
                 subTitle="Ordenes totales"
                 icon={ <CreditCardOutlined color="secondary" sx={{ fontSize: 40 }} /> }
@@ -94,14 +94,14 @@ const DashboardPage = () => {
 
         
             <CardDashboard 
-                link='admin/userstable'
-                title={ users?.length }
+               // link='admin/userstable'
+                title={ users.usuarios?.length }
                 subTitle="Usuarios"
                 icon={ <GroupOutlined color="primary" sx={{ fontSize: 40 }} /> }
             />
 
             <CardDashboard
-                link='admin/productstable'
+              //  link='admin/productstable'
                 title={products?.length }
                 subTitle="Productos"
                 icon={ <CategoryOutlined color="warning" sx={{ fontSize: 40 }} /> }
@@ -123,8 +123,8 @@ const DashboardPage = () => {
 
 
             <CardDashboard 
-                link='admin/questionstable'
-                title={ cantidadDePreguntasSinRespuesta?.length }
+               // link='admin/questionstable'
+                title={ 34 }
                 subTitle="Preguntas sin responder"
                 icon={ <HelpOutlineOutlinedIcon color="error" sx={{ fontSize: 40 }} /> }
             />

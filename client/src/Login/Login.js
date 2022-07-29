@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import ShoppingCartSharpIcon from '@mui/icons-material/ShoppingCartSharp';
 import '@fontsource/roboto/300.css';
 import {useDispatch,useSelector} from "react-redux"
-import {LOGINUSER,USERISLOGIN} from "../Redux/actions"
+import {LOGINUSER,USERISLOGIN,GETWISHLIST} from "../Redux/actions"
 import { AppDispatch,RootState } from '../Redux/store';
 import '../index.css';
 import jwt_decode from "jwt-decode";
@@ -125,7 +125,7 @@ const LoginPage = () => {
                 </Button>
 
                 <Button  className='circular-btn' size='small' sx={{color:'white', marginY:1,marginX:4}}
-                    onClick={()=>dispatch(USERISLOGIN()).then((navigate('/home')))}>
+                    onClick={()=>dispatch(USERISLOGIN()).then(dispatch(GETWISHLIST())).then((navigate('/home')))}>
                         Entrar como Invitado
                 </Button>
 

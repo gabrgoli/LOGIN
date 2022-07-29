@@ -7,44 +7,50 @@ import LocalMallIcon from '@mui/icons-material/LocalMall';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import SaveIcon from '@mui/icons-material/Save';
-//import {MODIFYUSER} from '../../actions'
 import { NavLink } from 'react-router-dom';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/500.css';
 import { useAuth0 } from "@auth0/auth0-react";
 import Loading from '../Components/Loading'
-import { MODIFYUSER } from '../Redux/actions';
+import { MODIFYUSER,USERISLOGIN } from '../Redux/actions';
 import swal from 'sweetalert'
 import Cookie from 'js-cookie'
-
+import { useSelector } from 'react-redux';
 
 const Profile=()=>{
     const dispatch=useDispatch()
     const [field,setField]=useState({})
-    const user=Cookie.get('user') && JSON.parse(Cookie.get('user'))
+    const usuario=useSelector((State) => State.rootReducer.usuario);
+
+    const user=usuario
+    console.log("USER PROFILE",user)
+
+    React.useEffect(()=>{
+        dispatch(USERISLOGIN())
+    },[])
 
     React.useEffect(()=>{
         setField(()=>({
              _id:user?._id||'',
-             avatar:user?.avatar||'',
-             name:user?.name||'',
-             email: user?.email||'',
-             adress:user?.adress||'',
-             city:user?.city||'',
-             country:user?.country||'',
-             phone:user?.phone||''
+             img:user?.img||'',
+             nombre:user?.nombre||'',
+             correo: user?.correo||'',
+             //adress:user?.direccion||'',
+            // city:user?.city||'',
+             //country:user?.country||'',
+             //phone:user?.phone||''
          }))
     },[])
 
     const [editable,setEditable]=useState({
-        avatar:false,
-        name:false,
-        email: false,
+        img:false,
+        nombre:false,
+        correo: false,
         password: false,
-        adress:false,
-        city:false,
-        country:false,
-        phone:false
+       // adress:false,
+       // city:false,
+       // country:false,
+      //  phone:false
     })
     const handleChange=(campo)=>{
         setEditable((old)=>({...old,[campo]:true}))
@@ -69,23 +75,17 @@ const Profile=()=>{
             display:'flex',flexDirection:'column',justifyContent:'space-around'}}>
 
             <Box sx={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
-            {/* <Box sx={{display:'flex',width:'100%',justifyContent:'flex-end',mb:2}}>
-                <IconButton sx={{display:'flex',borderRadius:1,bgcolor:color.color2}}>
-                    <LocalMallIcon/>
-                    <Typography variant='body2' sx={{fontWeight:20,mt:0,ml:1,color:'black'}}>Mis Compras</Typography>
-                </IconButton>
-            </Box> */}
-            <Avatar sx={{height:200,width:200}} alt={user.name} src={user.avatar||user.picture}/>
-            <Typography variant='h5' sx={{fontWeight:20,m:2}}>{user.given_name||user.name}</Typography>
+                <Avatar sx={{height:200,width:200}} alt={user.nombre} src={user.img}/>
+                <Typography variant='h5' sx={{fontWeight:20,m:2}}>{user.given_name||user.nombre}</Typography>
 
             <Divider flexItem/>
 
             
             <Box sx={{display:'flex',flexDirection:'column',alignItems:'flex-start',width:'100%'}}>
                 <Box sx={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%'}}>
-                    <Typography sx={{fontSize:'3vh',m:2,fontWeight:20}}>Nombre: {editable.name?
-                    <TextField name='name' variant='standard' size='small' placeholder={field.name} onChange={(e)=>Edit(e)}/>
-                    :field.name}
+                    <Typography sx={{fontSize:'3vh',m:2,fontWeight:20}}>Nombre: {editable.nombre?
+                    <TextField name='name' variant='standard' size='small' placeholder={field.nombre} onChange={(e)=>Edit(e)}/>
+                    :field.nombre}
                     </Typography>
                     <IconButton sx={{bgcolor:'blue'}} onClick={(e)=>{editable.name?handleSave('name'):handleChange('name')}}>
                         {editable.name?<CheckIcon/>:<EditIcon/>}
@@ -95,12 +95,12 @@ const Profile=()=>{
                 <Divider flexItem/>
 
                 <Box sx={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%'}}>
-                    <Typography sx={{fontSize:'3vh',m:2,fontWeight:20}}>Correo: {editable.email?
-                    <TextField name='email' variant='standard' size='small' placeholder={field.email} onChange={(e)=>Edit(e)}/>
-                    :field.email}
+                    <Typography sx={{fontSize:'3vh',m:2,fontWeight:20}}>Correo: {editable.correo?
+                    <TextField name='email' variant='standard' size='small' placeholder={field.correo} onChange={(e)=>Edit(e)}/>
+                    :field.correo}
                     </Typography>
-                    <IconButton sx={{bgcolor:'blue'}} onClick={(e)=>{editable.email?handleSave('email'):handleChange('email')}}>
-                        {editable.email?<CheckIcon/>:<EditIcon/>}
+                    <IconButton sx={{bgcolor:'blue'}} onClick={(e)=>{editable.correo?handleSave('email'):handleChange('email')}}>
+                        {editable.correo?<CheckIcon/>:<EditIcon/>}
                     </IconButton>
                 </Box>
                 

@@ -35,9 +35,21 @@ const UsuarioSchema = Schema({
     wishList: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'Producto'
-        }
+            ref: 'Producto',
+            default: []        }
     ],
+    direccion: {
+        type: String,
+    },
+    ciudad: {
+        type: String,
+    },
+    pais: {
+        type: String,
+    },
+    telefono: {
+        type: String,
+    },
 });
 
 

@@ -111,6 +111,14 @@ export const GETUSERS = createAsyncThunk('GETUSERS', async () => {
 
 })
 
+//Edita el usuario
+export const MODIFYUSER=createAsyncThunk('MODIFYUSER',async (input)=>{
+    const token=Cookie.get('token')
+    const user=await axios.put(`${api}/api/usuarios/${input._id}`,input,{headers:{
+      'x-access-token':`${token}`
+    }})
+    return user.data
+})
 
 
 
@@ -203,15 +211,6 @@ export const SEARCHBYNAMEUSERS=createAsyncThunk('SEARCHBYNAMEUSERS',async (name)
     return result.data
 })
 
-//Edita el usuario
-export const MODIFYUSER=createAsyncThunk('MODIFYUSER',async (input)=>{
-    const token=Cookie.get('token')
-    console.log("input",input)
-    const user=await axios.put(`${api}/users/${input._id}`,input,{headers:{
-      'x-access-token':`${token}`
-    }})
-    return user.data
-})
 
 //Crea una Review de un producto
 export const CREATEREVIEW = createAsyncThunk('CREATEREVIEW', async (input) => { 
