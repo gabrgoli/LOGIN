@@ -29,15 +29,16 @@ const HomePage=({wishlist,setWishList})=>{
     const dispatch=useDispatch()
 
     let productos=useSelector((state)=>state.rootReducer.productos)
-    //let userLogin=useSelector((state)=>state.rootReducer.userLogin)
-    //console.log('userLogin',userLogin)
+    
+
 
      React.useEffect(()=>{
          dispatch(GETPRODUCTS())
          dispatch(USERISLOGIN())
      },[dispatch])
 
-    console.log("first:",productos)
+
+   // console.log("productos:",productos)
 
     // React.useEffect(()=> // Esto es para Que se muestre El titulo de la categoria que se  muestra
     // {      

@@ -46,7 +46,7 @@ const LoginPage = () => {
                 //var userObject = jwt_decode(response.data.token);
                 //console.log("userObject",userObject)
                 Cookie.set('token',response.data.token)
-                Cookie.set('user',JSON.stringify(response.data.usuario))
+                //Cookie.set('user',JSON.stringify(response.data.usuario))
                 dispatch(USERISLOGIN())
                 return swal({title:"Éxito",text:`${response.data.msg}`,icon:"success",button:"Aceptar"}).then(
                     ()=>navigate("/home")
@@ -72,7 +72,7 @@ const LoginPage = () => {
             if(res.data.msg==="googleLogin Correcto"){
                 return swal({title:"Éxito",text:`${res.data.msg}`,icon:"success",button:"Aceptar"}).then(
                     Cookie.set('token',res.data.token)).then(
-                    Cookie.set('user',JSON.stringify(res.data.usuario))).then(
+                    //Cookie.set('user',JSON.stringify(res.data.usuario))).then(
                     ()=>dispatch(USERISLOGIN())).then(
                     ()=>navigate("/home")
                 )
@@ -125,7 +125,7 @@ const LoginPage = () => {
                 </Button>
 
                 <Button  className='circular-btn' size='small' sx={{color:'white', marginY:1,marginX:4}}
-                    onClick={()=>(navigate('/home'))}>
+                    onClick={()=>dispatch(USERISLOGIN()).then((navigate('/home')))}>
                         Entrar como Invitado
                 </Button>
 
@@ -135,7 +135,7 @@ const LoginPage = () => {
                 </Box>
 
 
-                <Divider>o</Divider>
+                <Divider >o</Divider>
                 
                 <Typography sx={{marginTop:1,marginX:4}} fontSize={14}>Olvidaste tu Contraseña?</Typography>
                 <Typography sx={{marginBottom:1,marginX:4}} color='black' fontSize={14} >No tienes cuenta? <Link to='/signup'>Crear</Link></Typography>

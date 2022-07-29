@@ -185,7 +185,7 @@ const addProductToWishlist = async (req, res, next) => {
             {$addToSet: {"wishList": producto._id}},//addtoSet no agrega otro elemento si ya existe en el array
             {upsert: true, new : true}).populate('wishList');
         
-        res.status(200).json(updatedUser)
+        res.status(200).json(updatedUser.wishList)
     } catch (error) {
         next(error)
     }
@@ -194,7 +194,6 @@ const addProductToWishlist = async (req, res, next) => {
 
 //ELIMINA PRODUCTO DE LA WISHLIST, CON EL ID
 const deleteProductToWishlist = async (req, res, next) => {
-        
     try {
         const {productId}=req.body
         const producto=await Producto.findById(productId)
@@ -203,17 +202,20 @@ const deleteProductToWishlist = async (req, res, next) => {
             {$pull: {"wishList": producto._id}},//pull elimina un objeto que matchee
             {upsert: true, new : true}).populate('wishList');
         
-        res.status(200).json(updatedUser)
+        res.status(200).json(updatedUser.wishList)
     } catch (error) {
         next(error)
     }
-            
-
 };
 
 const getusuariobytoken=async(req,res,next)=>{
-    res.status(200).json(req.usuario)
-}
+    try{
+        const user=req.usuario
+        res.status(200).json(user)
+    }catch(error){
+        next(error)
+    }
+};
 
 
 

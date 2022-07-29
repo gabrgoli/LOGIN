@@ -58,23 +58,31 @@ export const ADDTOWISHLIST = createAsyncThunk('ADDTOWISHLIST', async (productId)
 //Elimina un producto de la WishList
 export const DELETEFROMWISHLIST=createAsyncThunk('DELETEFROMWISHLIST',async (productId)=>{
     const token=Cookie.get('token')
-    const wishlist=await axios.put(`${api}/api/usuarios/wishlist`,productId,{headers:{
-      'x-token':`${token}`
-    }})
+    const wishlist=await axios.put(`${api}/api/usuarios/wishlist`,productId,{headers:{'x-token':`${token}`}})
     return wishlist.data
 })
 
 // Mostrar la lista de productos de la Wishlist
 export const GETWISHLIST = createAsyncThunk('GETWISHLIST', async () => { 
     const token=Cookie.get('token')
-    const response=await axios.get(`${api}/api/usuarios/wishlist` ,{
-        headers:{
-            'x-token':token
-        }
-    })
-    console.log("respuesta de wisjlist ",response.data)
+    const response=await axios.get(`${api}/api/usuarios/wishlist`,{headers:{'x-token':token}})
+    console.log("respuesta de wishlist actions ",response.data)
     return response.data
 }) 
+
+//Veridica si el usuario esta logeado
+export const USERISLOGIN=createAsyncThunk('USERISLOGIN', async()=>{
+    const token=Cookie.get('token')
+    try{
+        const response=await axios.get(`${api}/api/usuarios/getusuariobytoken`,{ headers:{'x-token':token}})
+        //console.log("respuetsa USERISLOGIN actions",response.data)
+        return response.data
+     }catch(error){
+         console.log("error",error.response.data.msg)
+         return []
+     }
+
+})
 
 //Ordena los productos por precio. La lógica se hace en el Reducer
 export const ORDERBYPRICE=createAction('ORDERBYPRICE',(order)=>{ 
@@ -90,16 +98,17 @@ export const VERIFYADMIN=createAsyncThunk('VERIFYADMIN',async ()=>{
     return false
 })
 
-//Veridica si el usuario esta logeado
-export const USERISLOGIN=createAsyncThunk('USERISLOGIN', async()=>{
-    const token= JSON.parse( Cookie.get('token') )
-    const response=await axios.get(`${api}/api/usuarios/getusuariobytoken` ,{
-        headers:{
-            'x-token':token
-        }
-    })
-    console.log("responseUSERISLOGIN",response.data)
-    return response.data
+//Devuelve todos los usuarios
+export const GETUSERS = createAsyncThunk('GETUSERS', async () => { 
+    const token=Cookie.get('token')
+    try{
+        const response = await axios(`${api}/api/usuarios`,{headers:{'x-token':`${token}`}})
+        return response.data
+    }catch(error){
+        console.log("error",error.response.data.msg)
+        return []
+    }
+
 })
 
 
@@ -180,14 +189,7 @@ return result.data
                         //      ACCIONES PARA USUARIOS      //   
                         /////////////////////////////////////    
 
-//Devuelve todos los usuarios
-export const GETUSERS = createAsyncThunk('GETUSERS', async () => { 
-    const token=Cookie.get('token')
-    const response = await axios(`${api}/users`,{headers:{
-        'x-access-token':`${token}`
-      }})
-    return response.data
-})
+
 
 
 //Busca un usuario por el nombre

@@ -28,7 +28,7 @@ const { usuariosGet,
 const router = Router();
 
 //TREAR TODOS LOS USUARIOS
-router.get('/', usuariosGet );
+router.get('/', [validarJWT,esAdminRole],usuariosGet );
 
 router.get('/getusuariobytoken',validarJWT, getusuariobytoken );
 
@@ -37,6 +37,7 @@ router.put('/modificarusuario/:id',[
     check('id', 'No es un ID válido').isMongoId(),
     check('id').custom( existeUsuarioPorId ),
     check('rol').custom( esRoleValido ), 
+    validarJWT,
     validarCampos
 ],usuariosPut );
 

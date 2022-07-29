@@ -13,14 +13,16 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import { useNavigate } from 'react-router-dom';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { ADDTOWISHLIST,DELETEFROMWISHLIST } from '../Redux/actions';
+import { ADDTOWISHLIST,DELETEFROMWISHLIST,GETWISHLIST } from '../Redux/actions';
 import { useDispatch } from 'react-redux';
-
+import { useSelector } from 'react-redux';
 
 //FUNCION PRINCIPAL
-export default function ProductCard({product,userLogin=false,wishlist,setWishList}) {
+export default function ProductCard({product}) {
   const [isHovered, setIsHovered] = useState (false);
   const [colorHeart, setColorHeart] = useState ();
+  let userLogin=useSelector((state)=>state.rootReducer.usuario)
+  let wishList2=useSelector((state)=>state.rootReducer.wishList)
   const navigate=useNavigate()
   const dispatch=useDispatch()
     const productImage = useMemo(()=>{
@@ -33,22 +35,27 @@ export default function ProductCard({product,userLogin=false,wishlist,setWishLis
     },[isHovered,product.imageProduct])
 
 
-   // CUANDO CAMBIA LA WISHLIST, MAPEA TODOS LOS PRODUCTOS DE LA WISHLIST Y SI COINCIDE CON EL DE CardProduct PINTA DE ROJO EL CORAZÓN
+   // CUANDO CAMBIA LA WISHLIST, MAPEA TODOS LOS PRODUCTOS DE LA WISHLIST Y SI COINCIDE CON EL DE Peoducto PINTA DE ROJO EL CORAZÓN
    React.useEffect(()=>{
     setColorHeart(()=>'black')
-    wishlist?.forEach((e)=>{
+    //wishlist?.forEach((e)=>{
+      wishList2?.forEach((e)=>{
       if(e._id===product._id)setColorHeart(()=>'red')
     })
-    },[wishlist])
+    },[wishList2])
 
     const addToWishList = () => { 
       if(colorHeart==="black"){
-        setWishList((old)=>[...old,product])
+        //setWishList((old)=>[...old,product])
+        //wishList2.push(product)
         dispatch(ADDTOWISHLIST({productId:product._id}))
+       // dispatch(GETWISHLIST())
       }
       else{
-        setWishList((old)=>old.filter(e=>e._id!==product._id))
+        //setWishList((old)=>old.filter(e=>e._id!==product._id))
+        //wishList2.filter(e=>e._id!==product._id)
         dispatch(DELETEFROMWISHLIST({productId:product._id}))
+       //dispatch(GETWISHLIST())
       } 
     }
 
@@ -61,7 +68,7 @@ export default function ProductCard({product,userLogin=false,wishlist,setWishLis
     onMouseEnter={()=> setIsHovered(true)}
     onMouseLeave={()=> setIsHovered(false)}
     >
-         {/*userLogin&&*/<Tooltip title="Agregar a favoritos" placement="top">
+         {userLogin.length!==0&&<Tooltip title="Agregar a favoritos" placement="top">
           <IconButton onClick={ addToWishList } style={{color: colorHeart}}>
             <FavoriteIcon />
           </IconButton>

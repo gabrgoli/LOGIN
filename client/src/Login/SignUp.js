@@ -87,7 +87,7 @@ const RegisterPage = () => {
                 const response=await axios.post(`${api}/api/usuarios/login`,input)
                 if(response.data.msg==="login correcto ok"){
                     Cookie.set('token',response.data.token)
-                    Cookie.set('user',JSON.stringify(response.data.usuario))
+                   //Cookie.set('user',JSON.stringify(response.data.usuario))
                     dispatch(USERISLOGIN())
                     return swal({title:"Éxito",text:`${response.data.msg}`,icon:"success",button:"Aceptar"}).then(
                         ()=>navigate("/home")

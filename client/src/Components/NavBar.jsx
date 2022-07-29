@@ -43,7 +43,7 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 }));
 
 
-export default function PrimarySearchAppBar({isAuthenticated,wishlist,setWishList}) {
+export default function PrimarySearchAppBar({isAuthenticated}) {
 
   const [isHovered, setIsHovered] = React.useState (false);
 
@@ -165,7 +165,7 @@ export default function PrimarySearchAppBar({isAuthenticated,wishlist,setWishLis
               
                 <Box sx={{display:'flex',alignItems:'center', justifyContent:'flex-end'}}>
                     {/* WISHLIST */}
-                    {<WishList wishlist={wishlist} setWishList={setWishList}/>}
+                    {<WishList/>}
                     {/* BOTON DE LOGIN O DE CUENTA */}
                   <Box sx={{ display: { md: 'flex' } }}>
                     {isAuthenticated?

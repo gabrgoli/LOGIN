@@ -26,9 +26,7 @@ const DashboardPage = () => {
 
     useEffect(()=>{
       dispatch(GETUSERS())
-      dispatch(GETORDERS())
       dispatch(GETPRODUCTS())
-      dispatch(GETALLQUESTIONS()).then((r)=>setQuestions(()=>r.payload))
     },[dispatch,refreshIn===0])
 
 
