@@ -1,1 +1,1 @@
- <img src="./foto.png" width="350" title="hover text">
+ <img src="./foto.png" width="800" title="hover text">
