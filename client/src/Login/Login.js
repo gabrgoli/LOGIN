@@ -1,5 +1,4 @@
-import { Box,Divider, Typography, TextField, Button,FormControl,Container ,CardMedia} from '@mui/material';
-//import { AuthLayout } from '../../components/layouts';
+import { Box,Divider, Typography, TextField, Button,FormControl,Container ,CardMedia,InputAdornment,OutlinedInput} from '@mui/material';
 import {Link} from 'react-router-dom'
 import { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,17 +12,22 @@ import jwt_decode from "jwt-decode";
 import axios from "axios"
 import Cookie from 'js-cookie'
 import swal from 'sweetalert';
+import IconButton from '@mui/material/IconButton';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 export const api=process.env.REACT_APP_URL_BACKEND||'http://localhost:8080'
 
 
 const LoginPage = () => {
-    const logged=useSelector((state)=>state.rootReducer.isLogged)
+
     const useAppDispatch = () => useDispatch();
     const dispatch=useAppDispatch()
     const [invalid,setInvalid]=useState(false)
     const [error,setError]=useState(false)
     const [input,setInput]=useState({
         correo:"",
+        showPassword: false,
         password:""
     })
 
@@ -37,31 +41,44 @@ const LoginPage = () => {
     }
     const navigate=useNavigate()
 
-    const handleSubmit= async ()=>{
-        try{
-           // dispatch(LOGINUSER(input)).then(r=>console.log(r))
-            const response=await axios.post(`${api}/api/usuarios/login`,input)
-            console.log("response",response)
-            if(response.data.msg==="login correcto ok"){
+    const handleSubmit= async (e)=>{
+        e.preventDefault();
+        //try{
+            dispatch(LOGINUSER(input))
+            //const response=await axios.post(`${api}/api/usuarios/login`,input)
+           // if(response.data.msg==="login correcto ok"){
                 //var userObject = jwt_decode(response.data.token);
                 //console.log("userObject",userObject)
-                Cookie.set('token',response.data.token)
+               // Cookie.set('token',response.data.token)
                 //Cookie.set('user',JSON.stringify(response.data.usuario))
-                dispatch(USERISLOGIN())
-                return swal({title:"Éxito",text:`${response.data.msg}`,icon:"success",button:"Aceptar"}).then(
+                //dispatch(USERISLOGIN())
+                return swal({title:"Éxito",text:`Loin Exitoso`,icon:"success",button:"Aceptar"}).then(
                     ()=>navigate("/home")
                 )
                
-            }
+          /*  }
         }catch (e){
             let respuesta= JSON.parse(e.request.response).msg;
             console.log('respuesta',respuesta)
             return swal({title:"Error",text:`${respuesta}`,icon:"error",button:"Aceptar"})
-        }
+        }*/
     }
 
+///////////////////////// ICONO DE OJITO PARA PASSWORD CON FUNCINALIDAD /////////////////////////////////////////
+    const handleClickShowPassword = () => {
+        setInput({
+          ...input,
+          showPassword: !input.showPassword,
+        });
+      };
+    
+      const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+      };
 
-    ////////////////////////  GOOGLE SIGNIN SIGNUP  /////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////Ç
+
+//////////////////////////////////////  GOOGLE SIGNIN SIGNUP  /////////////////////////////////
     async function handleCallbackResponse(response){
         console.log("token",response.credential)
         var userObject = jwt_decode(response.credential);
@@ -101,6 +118,7 @@ const LoginPage = () => {
 
 
     return(
+        <form>
         <Box display='flex' flexDirection='row' justifyContent='center' margin='90px'>
 
             <Box sx={{display:'flex',flexDirection:'column',justifyContent:'center',border:'1px solid gray',borderRadius:2,width:320,bgcolor:'white',boxShadow:10}}>
@@ -112,20 +130,34 @@ const LoginPage = () => {
                     alt="gf"
                     sx={{objectFit:'contain'}}
                 />
-                
+            
                 {invalid && <Typography sx={{m:0,fontSize:{xs:10,sm:15},color:'red'}}>Usuario o contraseña incorrectos</Typography>}
                 
                 <TextField error={error} name='correo' label='Correo' variant="outlined" onChange={(e)=>handleChange(e)}  size='small' sx={{marginY:1,marginX:4}}></TextField>
                 
-                <TextField name='password' label='Contraseña' type='password' onChange={(e)=>handleChange(e)} variant="outlined"  size='small' sx={{marginY:1,marginX:4}}></TextField>
+                <OutlinedInput 
+                    id="outlined-adornment-password"
+                    endAdornment={
+                    <InputAdornment position="end">
+                        <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                        >
+                        {input.showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                    </InputAdornment>
+                    }
+                    name='password' value={input.password} label='Contraseña' type={input.showPassword ? 'text' : 'password'} onChange={(e)=>handleChange(e)} variant="outlined"  size='small' sx={{marginY:1,marginX:4}}></OutlinedInput>
                 
-                <Button  className='circular-btn' size='small' sx={{color:'white',marginY:1,marginX:4}}
-                    onClick={()=>handleSubmit()}>
+                <Button onClick={handleSubmit} type='submit' value='buscar' className='circular-btn' size='small' sx={{color:'white',marginY:1,marginX:4}}>
                         Ingresar
                 </Button>
-
+            
                 <Button  className='circular-btn' size='small' sx={{color:'white', marginY:1,marginX:4}}
-                    onClick={()=>dispatch(USERISLOGIN()).then(dispatch(GETWISHLIST())).then((navigate('/home')))}>
+                    //onClick={()=>Cookie.set('token','').then(dispatch(USERISLOGIN())).then(dispatch(GETWISHLIST())).then((navigate('/home')))}>
+                    onClick={()=>Cookie.get('token')==='invitado'?((navigate('/home'))):Cookie.set('token','invitado')}>
                         Entrar como Invitado
                 </Button>
 
@@ -137,10 +169,11 @@ const LoginPage = () => {
 
                 <Divider >o</Divider>
                 
-                <Typography sx={{marginTop:1,marginX:4}} fontSize={14}>Olvidaste tu Contraseña?</Typography>
+                <Typography sx={{marginTop:1,marginX:4}} fontSize={14}>Olvidaste tu Contraseña?<Link to='/enviomail'>Recuperar</Link></Typography>
                 <Typography sx={{marginBottom:1,marginX:4}} color='black' fontSize={14} >No tienes cuenta? <Link to='/signup'>Crear</Link></Typography>
             </Box>
         </Box>
+        </form>
     )
 }
 

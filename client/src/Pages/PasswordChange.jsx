@@ -1,10 +1,10 @@
 import React from "react";
 import NavBar from "../Components/NavBar"
 import { useState } from 'react';
-import {   useNavigate } from "react-router-dom"
-import { /*TextField,Select,Container, CardMedia,Link, FormLabel, FormControlLabel, UploadOulined, MenuItem*/ Box, InputLabel, OutlinedInput, InputAdornment, Typography, Button } from '@mui/material';
-//import { useDispatch } from 'react-redux'
-
+import { useNavigate } from "react-router-dom"
+import {Box, InputLabel, OutlinedInput, InputAdornment, Typography, Button /*TextField,Select,Container, CardMedia,Link, FormLabel, FormControlLabel, UploadOulined, MenuItem*/  } from '@mui/material';
+import { useDispatch } from 'react-redux'
+import { CHANGEPASSWORD } from '../Redux/actions'
 
 import IconButton from '@mui/material/IconButton';
 //import Input from '@mui/material/Input';
@@ -13,8 +13,9 @@ import IconButton from '@mui/material/IconButton';
 import FormControl from '@mui/material/FormControl';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-
+import { useParams } from 'react-router-dom';
 import swal from 'sweetalert';
+
 
 function validate(newPass){
   let errors = {} //creo un objeto vacio
@@ -24,20 +25,23 @@ function validate(newPass){
   } else if (newPass.password.length<6){
       errors.password = "tu contraseña debe tener por lo menos 6 caracteres"
   } 
-  else if (!(/\d/.test(newPass.password))){//verifica si tiene numero
+ /* else if (!(/\d/.test(newPass.password))){//verifica si tiene numero
     errors.password = "tu contraseña debe tener por lo menos 1 número"
-}
+}*/
 
   return errors
 }
 
 export default function PasswordChange() {
 
-  //const dispatch=useDispatch()
+  const {tokenId}=useParams()
+  const dispatch=useDispatch()
+  console.log("cual es el id de usuario:",tokenId)
   const navegar = useNavigate()  //para navegar al home luego de postear el formulario
   const [newPass, setnewPass] = React.useState({
     password: '',
     showPassword: false,
+    tokenId:tokenId
   });
 
   const [errors, setErrors] = useState({}) //estado local para manejar errores, objeto vacio
@@ -64,33 +68,10 @@ export default function PasswordChange() {
 
   
     function handleSubmit(e){
-      e.preventDefault()
-          //const newPost={...input,imageProduct:images[0]?images:["https://res.cloudinary.com/dnlooxokf/image/upload/v1654057815/images/pzhs1ykafhvxlhabq2gt.jpg"]} // se prepara un objeto con los campos del fomrulario y sus imagenes
-          //dispatch(CREATEPRODUCT(newPost))
-          swal({
-            title:"Se cambio la contraseña exitosamente",
-            text:"Se reaizo el cambio correctamente",
-            icon:"success",
-            button:"Aceptars"
-          })
-
-          /*Swal.fire({
-            title: 'Custom width, padding, color, background.',
-            width: 600,
-            padding: '3em',
-            color: '#716add',
-            background: '#fff url(/images/trees.png)',
-            backdrop: `
-              rgba(0,0,123,0.4)
-              url("/images/nyan-cat.gif")
-              left top
-              no-repeat
-            `
-          })
-*/
-
-          //navegar("/")//se accede al home
-         // window.location.reload();//se refresca para activar el dispatch de GETPRODUCTS()       
+     e.preventDefault()
+     dispatch(CHANGEPASSWORD(newPass))
+     //console.log("newPass",newPass)
+   
   }
 
 
@@ -98,10 +79,12 @@ export default function PasswordChange() {
       <div>
         <NavBar/>
 
-        <Typography display='flex'  justifyContent='center' variant='h2' mt={18}>Cambio de contraseña</Typography>
+        
 
         <Box display='flex'  mt={5}  justifyContent='center' >
-              <FormControl sx={{  width: '50%' }} variant="outlined"  mt={5}>
+        
+              <FormControl  variant="outlined">
+              <Typography display='flex' justifyContent='center' variant='h4' mb={3} marginTop={15}>Cambio de contraseña</Typography>
                 <InputLabel htmlFor="outlined-adornment-password" >Nueva contraseña</InputLabel>
                 <OutlinedInput
                   id="outlined-adornment-password"
@@ -123,7 +106,16 @@ export default function PasswordChange() {
                   }
                   label="Password"
                 />                                         
-                    <Button fullWidth sx={{ mb: 3 }} disabled={newPass.password===""|| errors.password}  width="100%" type="submit" onClick={(e) => handleSubmit(e)}>Cambiar contraseña</Button>
+                    <Button 
+                      fullWidth 
+                      sx={{ marginTop: 3 }} 
+                      disabled={newPass.password===""|| errors.password}  
+                      width="100%" 
+                      type="submit" 
+                      variant="contained"
+                      onClick={(e) => handleSubmit(e)}>
+                        Cambiar contraseña
+                    </Button>
               </FormControl>
         </Box>
         <Typography display='flex' justifyContent='center'>{errors.password && (<p >{errors.password}</p>)}</Typography>

@@ -107,7 +107,7 @@ export default function PrimarySearchAppBar({isAuthenticated}) {
           <ListItemText primary={'Home'} />
         </ListItem>
 
-      {usuario.correo&&<ListItem    /// IR A MI PERFIL
+      {usuario?.correo&&<ListItem    /// IR A MI PERFIL
           button
           onClick={ () => navigate('/profile') }>
           <ListItemIcon>
@@ -116,7 +116,7 @@ export default function PrimarySearchAppBar({isAuthenticated}) {
           <ListItemText primary={'Mi perfil'} />
         </ListItem>}
 
-        {(usuario.rol)?.includes('ADMIN')&&<ListItem   //DASHBOARD
+        {(usuario?.rol)?.includes('ADMIN')&&<ListItem   //DASHBOARD
           button
           onClick={ () => navigate('/admin') }>
           <ListItemIcon>
@@ -126,7 +126,7 @@ export default function PrimarySearchAppBar({isAuthenticated}) {
         </ListItem>}
 
 
-        {usuario.correo&&<ListItem //BOTON SALIR LOGOUT
+        {usuario?.correo&&<ListItem //BOTON SALIR LOGOUT
           button
           onClick={ () => {
             //Cookie.set('user',JSON.stringify([]))//pone en blanco al usuario n cookies
@@ -189,7 +189,7 @@ export default function PrimarySearchAppBar({isAuthenticated}) {
                     {<WishList/>}
                     {/* BOTON DE LOGIN O DE CUENTA */}
                   <Box sx={{ display: { md: 'flex' } }}>
-                    {usuario.correo?
+                    {usuario?.correo?
                     //SI ESTA LOGEADO , BOTON DE CUENTA DE USUARIO
                     <IconButton
                       size="large"

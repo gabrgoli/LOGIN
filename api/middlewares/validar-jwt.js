@@ -8,14 +8,21 @@ const validarJWT = async( req = request, res = response, next ) => {
 
     const token = req.header('x-token');
 
-   // console.log('token',token)
+    console.log('token',token)
 
-    try {
+   // try {
 
-    if ( !token||token===undefined ) {
-        return res.status(401).json({msg: 'No hay token en la petición'});
+    if ( token==='invitado' ) {
+        req.usuario ={nombre:'invitado'};
+        return next();
+    }
+
+    if ( !token||token===undefined||token==='' ) {
+         return res.status(401).json({msg: 'Token no válido'});
         //return res.status(401).json([]);
     }
+
+
 
     // creo un comodin para usar el token siempre
     if ( token==='123456789' ) {
@@ -28,34 +35,34 @@ const validarJWT = async( req = request, res = response, next ) => {
         req.usuario = user;
         return next();
     }   
-        const { uid } = jwt.verify( token, process.env.SECRETORPRIVATEKEY );
 
+    //try{
+        const { uid } = jwt.verify( token, process.env.SECRETORPRIVATEKEY );
         // leer el usuario que corresponde al uid
         const usuario = await Usuario.findById( uid );
+    // }     catch (error) {
+    //      res.status(401).json(
+    //          {msg: 'Token no válido' }
+    //          //[]
+    //     )
+    //  }
 
-        //if( !usuario ) {return res.status(401).json({msg: 'Token no válido - usuario no existe DB'})}
-        if( !usuario )return res.status(401).json([]);
+        if( !usuario ) {return res.status(401).json({msg: 'Token no válido'})}
+        //if( !usuario )return res.status(401).json([]);
 
         // Verificar si el uid tiene estado true para poder logearse
         if ( !usuario.estado ) {
             return res.status(401).json(
-                {msg: 'Token no válido - usuario con estado: false' }
+                {msg: 'Usuario bloqueado' }
                 //[]
            )
         }
         
         req.userId=uid;
         req.usuario = usuario;
-        next();
+        return next();
 
-    } catch (error) {
 
-       // console.log(error);
-        res.status(401).json(
-            {msg: 'Token no válido' }
-            //[]
-       )
-    }
 
 }
 

@@ -41,9 +41,7 @@ const UsuarioSchema = Schema({
     direccion: {
         type: String,
     },
-    ciudad: {
-        type: String,
-    },
+    
     pais: {
         type: String,
     },

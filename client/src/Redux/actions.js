@@ -1,6 +1,8 @@
 import axios from "axios"
 import { createAction, createAsyncThunk } from "@reduxjs/toolkit"
 import Cookie from 'js-cookie'
+import swal from 'sweetalert';
+import { useNavigate } from 'react-router-dom';
 
 export const api=process.env.REACT_APP_URL_BACKEND||'http://localhost:8080'
 //export const api='https://app3tech-backend.herokuapp.com'
@@ -16,9 +18,16 @@ export const SIGNUPUSER = createAsyncThunk('SIGNUPUSER', async (input) => {
 })
 
 export const LOGINUSER = createAsyncThunk('LOGINUSER', async (input) => { 
-    //console.log(input)
-    const response=await axios.post(`${api}/api/usuarios/login`,input)
-    return response
+    try{
+        const response=await axios.post(`${api}/api/usuarios/login`,input)
+        Cookie.set('token',response.data.token)
+        console.log("usuario Login Acciones:",response.data.usuario )
+        return response.data.usuario
+    }catch (e){
+        let respuesta= JSON.parse(e.request.response).msg;
+        console.log('respuesta',respuesta)
+        return swal({title:"Error",text:`${respuesta}`,icon:"error",button:"Aceptar"})
+    }
 })
 
 //trae todos los productos
@@ -26,62 +35,95 @@ export const GETPRODUCTS = createAsyncThunk('GETPRODUCTS', async () => {
     const response = await axios(`${api}/api/productos`)
     return response.data
 })
+
 //devuelve las categorias de productos de la tabla category
 export const GETCATEGORIES = createAsyncThunk('GETCATEGORIES', async () => { 
     const response = await axios(`${api}/api/categorias`)
     return response.data
 })
 
-//recibe info por post y crea un producto
+// CREAR UN PRODUCTO
 export const CREATEPRODUCT = createAsyncThunk('CREATEPRODUCT', async (input) => { 
-    const token=Cookie.get('token')
-    const response=await axios.post(`${api}/api/productos`,input ,{
-        headers:{
-            'x-token':token
+    try{
+        const token=Cookie.get('token')
+        const response=await axios.post(`${api}/api/productos`,input ,{headers:{'x-token':token}})
+        return response.data
+    }catch(error){
+        console.log("respuesta de CREATEPRODUCT actions ",JSON.parse(error.request.response).msg)
+        
+        if(JSON.parse(error.request.response).msg==='Token no válido'){
+            Cookie.set('token','')
+            return swal({title:"Error",text:`La sesión expiró, debe iniciar sesión de nuevo`,icon:"error",button:"Aceptar"}).then(()=>window.location.href = `/`)
         }
-    })
-    return response.data
+    }
+
 })
 
 
 //Agrega un producto a la Wishlist
 export const ADDTOWISHLIST = createAsyncThunk('ADDTOWISHLIST', async (productId) => { 
-    const token=Cookie.get('token')
-    const response=await axios.post(`${api}/api/usuarios/wishlist`,productId ,{
-        headers:{
-            'x-token':token
+    try{
+        const token=Cookie.get('token')
+        const response=await axios.post(`${api}/api/usuarios/wishlist`,productId ,{headers:{'x-token':token}})
+        console.log(response.data)
+        return response.data
+    }catch(error){
+        console.log("respuesta de ADDTOWISHLIST actions ",JSON.parse(error.request.response).msg)
+        if(JSON.parse(error.request.response).msg==='Token no válido'){
+            Cookie.set('token','')
+            return swal({title:"Error",text:`La sesión expiró, debe iniciar sesión de nuevo`,icon:"error",button:"Aceptar"}).then(()=>window.location.href = `/`)
         }
-    })
-    return response.data
+    }
+
 })
 
 //Elimina un producto de la WishList
 export const DELETEFROMWISHLIST=createAsyncThunk('DELETEFROMWISHLIST',async (productId)=>{
-    const token=Cookie.get('token')
-    const wishlist=await axios.put(`${api}/api/usuarios/wishlist`,productId,{headers:{'x-token':`${token}`}})
-    return wishlist.data
+    try{
+        const token=Cookie.get('token')
+        const response=await axios.put(`${api}/api/usuarios/wishlist`,productId,{headers:{'x-token':token}})
+        return response.data
+    }catch(error){
+        console.log("respuesta de DELETEFROMWISHLIST actions ",JSON.parse(error.request.response).msg)
+        if(JSON.parse(error.request.response).msg==='Token no válido'){
+            Cookie.set('token','')
+            return swal({title:"Error",text:`La sesión expiró, debe iniciar sesión de nuevo`,icon:"error",button:"Aceptar"}).then(()=>window.location.href = `/`)
+        }
+    }
 })
 
-// Mostrar la lista de productos de la Wishlist
+// GET productos de la Wishlist
 export const GETWISHLIST = createAsyncThunk('GETWISHLIST', async () => { 
-    const token=Cookie.get('token')
-    const response=await axios.get(`${api}/api/usuarios/wishlist`,{headers:{'x-token':token}})
-    console.log("respuesta de wishlist actions ",response.data)
-    return response.data
+    try{
+        const token=Cookie.get('token')
+        const response=await axios.get(`${api}/api/usuarios/wishlist`,{headers:{'x-token':token}})
+        //console.log("respuesta de wishlist actions ",response.data)
+        return response.data
+    }catch(error){
+        console.log("respuesta de GETWISHLIST actions ",JSON.parse(error.request.response).msg)
+        if(JSON.parse(error.request.response).msg==='Token no válido'){
+            Cookie.set('token','')
+            return swal({title:"Error",text:`La sesión expiró, debe iniciar sesión de nuevo`,icon:"error",button:"Aceptar"}).then(()=>window.location.href = `/`)
+        }
+    }
+
 }) 
 
 //Veridica si el usuario esta logeado
 export const USERISLOGIN=createAsyncThunk('USERISLOGIN', async()=>{
-    const token=Cookie.get('token')
+    
     try{
+        const token=Cookie.get('token')
         const response=await axios.get(`${api}/api/usuarios/getusuariobytoken`,{ headers:{'x-token':token}})
         //console.log("respuetsa USERISLOGIN actions",response.data)
         return response.data
      }catch(error){
-         console.log("error",error.response.data.msg)
-         return []
-     }
-
+        console.log("respuesta de USERISLOGIN actions ",JSON.parse(error.request.response).msg)
+        if(JSON.parse(error.request.response).msg==='Token no válido'){
+            Cookie.set('token','')
+            return swal({title:"Error",text:`La sesión expiró, debe iniciar sesión de nuevo`,icon:"error",button:"Aceptar"}).then(()=>window.location.href = `/`)
+        }
+    }
 })
 
 //Ordena los productos por precio. La lógica se hace en el Reducer
@@ -105,26 +147,74 @@ export const GETUSERS = createAsyncThunk('GETUSERS', async () => {
         const response = await axios(`${api}/api/usuarios`,{headers:{'x-token':`${token}`}})
         return response.data
     }catch(error){
-        console.log("error",error.response.data.msg)
-        return []
+        console.log("respuesta de GETUSERS actions ",JSON.parse(error.request.response).msg)
+        if(JSON.parse(error.request.response).msg==='Token no válido'){
+            Cookie.set('token','')
+            return swal({title:"Error",text:`La sesión expiró, debe iniciar sesión de nuevo`,icon:"error",button:"Aceptar"}).then(()=>window.location.href = `/`)
+        }
     }
-
 })
 
 //Edita el usuario
 export const MODIFYUSER=createAsyncThunk('MODIFYUSER',async (input)=>{
-    const token=Cookie.get('token')
-    const user=await axios.put(`${api}/api/usuarios/${input._id}`,input,{headers:{
-      'x-access-token':`${token}`
-    }})
-    return user.data
+    try{
+        const token=Cookie.get('token')
+        const user=await axios.put(`${api}/api/usuarios/modificarusuario/${input._id}`,input,{headers:{'x-token':`${token}`}})
+        return user.data
+
+    }catch(error){
+        console.log("respuesta de MODIFYUSER actions ",JSON.parse(error.request.response).msg)
+        if(JSON.parse(error.request.response).msg==='Token no válido'){
+            Cookie.set('token','')
+            return swal({title:"Error",text:`La sesión expiró, debe iniciar sesión de nuevo`,icon:"error",button:"Aceptar"}).then(()=>window.location.href = `/`)
+        }
+    }
+})
+
+//ENVIA MAIL DE CONFIRMACION
+export const SENDEMAIL=createAsyncThunk('SENDEMAIL',async (input)=>{
+    try{
+        const respuesta=await axios.post(`${api}/api/usuarios/enviomail`,input)
+        console.log(respuesta.data)
+        swal({title:"Exito",text:`${respuesta.data.msg}: ${respuesta.data.usuario.correo}`,icon:"success",button:"Aceptar"}).then(()=>window.location.href = `/`)
+        return respuesta.data
+
+    }catch(error){
+        console.log("respuesta de SENDEMAIL actions ",JSON.parse(error.request.response).msg)
+            return swal({title:"Error",text:`${JSON.parse(error.request.response).msg}`,icon:"error",button:"Aceptar"})
+        }
+    }
+)
+
+//CAMBIO DE CONTRASEÑA
+export const CHANGEPASSWORD=createAsyncThunk('CHANGEPASSWORD',async (input)=>{
+    try{
+        const respuesta=await axios.put(`${api}/api/usuarios/passwordchange`,input)
+        console.log(respuesta.data)
+        swal({title:"Exito",text:`${respuesta.data.msg}: ${respuesta.data.usuario.correo}`,icon:"success",button:"Aceptar"}).then(()=>window.location.href = `/`)
+        return respuesta.data
+
+    }catch(error){
+        console.log("respuesta de SENDEMAIL actions ",JSON.parse(error.request.response).msg)
+            return swal({title:"Error",text:`${JSON.parse(error.request.response).msg}`,icon:"error",button:"Aceptar"})
+        }
+    }
+)
+
+//Busca un producto por su nombre
+export const SEARCHBYNAMEPRODUCTS=createAsyncThunk('SEARCHBYNAMEPRODUCTS',async (nombre)=>{
+    const result=await axios(`${api}/api/productos?name=${nombre}`) 
+    return result.data
+})
+
+//Busca todos los productos de una categoria
+export const SEARCHBYCATEGORY=createAsyncThunk('SEARCHBYCATEGORY',async (nombre)=>{ 
+    const result=await axios(`${api}/productps?filterName=category&filterOrder=${nombre?.toLocaleLowerCase()}&names=stock&sort=1`) 
+    return result.data
 })
 
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////
-
 
 
 
@@ -146,33 +236,6 @@ export const GETPRODUCT = createAsyncThunk('GETPRODUCT', async (id) => {
     return response.data
 })
 
-
-//Busca un producto por su nombre
-export const SEARCHBYNAMEPRODUCTS=createAsyncThunk('SEARCHBYNAMEPRODUCTS',async (name)=>{
-    const result=await axios(`${api}/products?name=${name}`) 
-    return result.data
-})
-
-//Busca todos los productos de una categoria
-export const SEARCHBYCATEGORY=createAsyncThunk('SEARCHBYCATEGORY',async (name)=>{ 
-    const result=await axios(`${api}/products?filterName=category&filterOrder=${name?.toLocaleLowerCase()}&names=stock&sort=1`) 
-    return result.data
-})
-
-
-//Devuelve todos los preoductos que tengan la misma categoria que el producto con la id seleccionada
-export const GETRECOMMENDED=createAsyncThunk('GETRECOMMENDED',async (id)=>{
-    const allProducts = await axios.get(`${api}/products`)
-    const productById = await axios.get(`${api}/products/${id}`)
-    //console.log('allProducts',allProducts)
-    //console.log('productById',productById)
-    const final=allProducts.data.filter(product=>{
-        if(product.category._id===productById.data.category&&product._id!==id)return true
-        else return false
-      })
-    return final
-})
-
 //Edita el producto
 export const MODIFYPRODUCT=createAsyncThunk('MODIFYPRODUCT',async (input)=>{
     const token=Cookie.get('token')
@@ -181,6 +244,7 @@ export const MODIFYPRODUCT=createAsyncThunk('MODIFYPRODUCT',async (input)=>{
     }})
     return product.data
   })
+
 // Elimina el producto
 export const DELETEPRODUCT=createAsyncThunk('DELETEPRODUCT',async (id)=>{
 const token=Cookie.get('token')
@@ -191,14 +255,6 @@ const result=await axios.delete(`${api}/products/${id}`,{
 }) 
 return result.data
   })
-
-
-                        ///////////////////////////////////////   
-                        //      ACCIONES PARA USUARIOS      //   
-                        /////////////////////////////////////    
-
-
-
 
 //Busca un usuario por el nombre
 export const SEARCHBYNAMEUSERS=createAsyncThunk('SEARCHBYNAMEUSERS',async (name)=>{
@@ -212,171 +268,6 @@ export const SEARCHBYNAMEUSERS=createAsyncThunk('SEARCHBYNAMEUSERS',async (name)
 })
 
 
-//Crea una Review de un producto
-export const CREATEREVIEW = createAsyncThunk('CREATEREVIEW', async (input) => { 
-    const token=Cookie.get('token')
-    const response=await axios.post(`${api}/users/review`,input ,{
-        headers:{
-            'x-access-token':token
-        }
-    })
-    return response.data
-})
-
-//Edita la Review de un producto
-export const MODIFYREVIEW=createAsyncThunk('MODIFYREVIEW',async (postValue)=>{
- 
-    const token=Cookie.get('token')
-    const response=await axios.put(`${api}/users/review/${postValue.reviewId}`,postValue,{headers:{
-      'x-access-token':`${token}`
-    }})
-    return response.data
-})
-
-/*  Devuelve una sola review
-export const GETREVIEW = createAsyncThunk('GETREVIEW', async (id) => {
-const response = await axios.get(`${api}/users/review/${id}`)
-return response.data
-})
-*/
-
-//Devuelve todas las reviews de la BDD
-export const GETREVIEWS = createAsyncThunk('GETREVIEWS', async () => { 
-    const token=Cookie.get('token')
-    const response = await axios.get(`${api}/users/review`,{headers:{
-        'x-access-token':`${token}`
-      }})
-    return response.data
-})
-
-//Devuelve todas las reviews de un producto
-export const GETPRODUCTREVIEWS = createAsyncThunk('GETPRODUCTREVIEWS', async (id) => { 
-    const response = await axios(`${api}/products/${id}/reviews`)
-    return response.data
-})
-
-
-
-
-
-
-//Devuelve todas las preguntas de un producto
-export const GETPRODUCTQUESTIONS = createAsyncThunk('GETPRODUCTQUESTION', async (productId) => { 
-    const token=Cookie.get('token')
-    const response = await axios(`${api}/products/${productId}/questions`,{headers:{
-        'x-token':`${token}`
-      }})
-    return response.data
-})
-
- //Devuelve todas las preguntas de la BDD
-export const GETALLQUESTIONS = createAsyncThunk('GETALLQUESTIONS', async () => {
-    const token=Cookie.get('token')
-    const response = await axios(`${api}/questions`,{headers:{
-        'x-token':`${token}`
-    }})
-    return response.data
-})
-
-//Crea una pregunta
-export const MAKEQUESTION = createAsyncThunk('MAKEQUESTION', async (input) => { //
-    const token=Cookie.get('token')
-    const response = await axios.post(`${api}/products/${input.productId}/questions`,input ,{
-        headers:{
-            'x-access-token':token
-        }
-    })
-    return response.data
-})
-
-//Crea una respuesta a una cierta pregunta
-export const MAKEANSWER = createAsyncThunk('MAKEANSWER', async (input) => { //
-    const token=Cookie.get('token')
-    const response = await axios.post(`${api}/products/${input.productId}/questions/${input.questionId}`,input ,{
-        headers:{
-            'x-access-token':token
-        }
-    })
-    return response.data
-})
-
-                        ///////////////////////////////////////   
-                        //   ACCIONES PARA ORDENES Y PAGOS  //   
-                        /////////////////////////////////////    
-
-// Devuelve todas las ordenes de la BDD
-export const GETORDERS = createAsyncThunk('GETORDERS', async () => { 
-    const token=Cookie.get('token')
-    const response = await axios(`${api}/orders`,{
-        headers:{
-            'x-access-token':token
-        }
-    })
-    return response.data
-})
-
-//Editar una orden de la BDD
-export const EDITORDER=createAsyncThunk('EDITYORDER',async (input)=>{
-    const token=Cookie.get('token')
-    const order=await axios.put(`${api}/orders/${input._id}`,input,{headers:{
-      'x-access-token':`${token}`
-    }})
-    return order.data
-})
-
-//Buscar producto o usuario en una orden, en las rutas esta la logica, puedo buscar por nombre o email de usuario y por nombre de producto
-export const SEARCHORDERS = createAsyncThunk('SEARCHORDERS', async (name) => { //
-    const token=Cookie.get('token')
-    const response = await axios(`${api}/orders?name=${name}`,{
-        headers:{
-            'x-access-token':token
-        }
-    })
-    return response.data
-})
-
-//Devuelve una orden deteminada a  traves del id de la orden
-export const GETORDER=createAsyncThunk('GETORDER',async (id)=>{
-    const token=Cookie.get('token')
-    const result=await axios.get(`${api}/orders/${id}`,{
-        headers:{
-            'x-access-token':token
-        }
-    }) 
-    return result.data
-  })
-
-//Crea una orden
-export const CREATEORDER=createAsyncThunk('CREATEORDER',async (data)=>{
-    const token=Cookie.get('token')
-    const result=await axios.post(`${api}/orders`,data,{
-        headers:{
-            'x-access-token':token
-        }
-    })
-    return result.data._id
-})
-  
-// Pagar una orden
-export const PAYORDER=createAsyncThunk('PAYORDER',async (data)=>{
-    const token=Cookie.get('token')
-    var result=await axios.post(`${api}/orders/pay`,data,{
-        headers:{
-            'x-access-token':token
-        }})
-    return result.data
-})
-
-//Eliminar una orden
-export const DELETEORDER=createAsyncThunk('DELETEORDER',async (id)=>{
-    const token=Cookie.get('token')
-    const result=await axios.delete(`${api}/orders/${id}`,{
-        headers:{
-            'x-access-token':token
-        }
-    }) 
-    return result.data
-  })
 
 
 

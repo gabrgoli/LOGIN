@@ -3,14 +3,14 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 const {validarCampos,validarJWT,esAdminRole,tieneRole} = require('../middlewares');
 const { esRoleValido, emailExiste, existeUsuarioPorId } = require('../helpers/db-validators');
-
 const { response, request } = require('express');
 const bcryptjs = require('bcryptjs');
 const Usuario = require('../models/usuario');
 const Producto = require('../models/producto');
-
 const { generarJWT } = require('../helpers/generar-jwt');
 const { googleVerify } = require('../helpers/google-verify');
+const emailer = require("../nodeMailer/emailer")
+const jwt = require('jsonwebtoken');
 
 //const { usuariosGet,usuariosPut, signIn, usuariosDelete,usuariosPatch, login, googleSignin,getWishlist, addProductToWishlist,deleteProductToWishlist, getusuariobytoken,} = require('../controllers/usuarios');
 
@@ -35,7 +35,7 @@ router.get('/', [validarJWT,esAdminRole],async(req = request, res = response) =>
     });
 } );
 
-// OBTENER EL USUARIO USUARIO
+// GET USUARIO
 router.get('/getusuariobytoken',validarJWT, async(req,res,next)=>{
     try{
         const user=req.usuario
@@ -45,12 +45,29 @@ router.get('/getusuariobytoken',validarJWT, async(req,res,next)=>{
     }
 } );
 
-// MODIFICAR USUARIO
+
+// ENVIAR MAIL DE CONFIRMACION
+router.post('/enviomail',async(req, res = response) => {
+    const { correo } = req.body;
+    const usuario = await Usuario.findOne({ correo });
+
+    if ( !usuario ) { return res.status(400).json({ msg: 'No existe el usuario'});}
+    if ( usuario.google ) { return res.status(400).json({ msg: 'Usuario de google!!'});}
+    
+    const token = await generarJWT( usuario._id );
+
+    emailer.sendMail(usuario,token)
+
+    res.json({usuario,msg: "se envió un mail a tu correo"});
+} );
+
+// EDITAR UN USUARIO
 router.put('/modificarusuario/:id',[
-    check('id', 'No es un ID válido').isMongoId(),
-    check('id').custom( existeUsuarioPorId ),
-    check('rol').custom( esRoleValido ), 
+    //check('id', 'No es un ID válido').isMongoId(),
+    //check('id').custom( existeUsuarioPorId ),
+    //check('rol').custom( esRoleValido ), 
     validarJWT,
+    esAdminRole,
     validarCampos
 ],async(req, res = response) => {
 
@@ -63,9 +80,30 @@ router.put('/modificarusuario/:id',[
         resto.password = bcryptjs.hashSync( password, salt );
     }
 
-    const usuario = await Usuario.findByIdAndUpdate( id, resto );
+    await Usuario.findByIdAndUpdate( id, resto );
+    const usuario = await Usuario.findById( id );
+    res.json({usuario,msg:"se modificaron los datos del usuario exitosamente"});
+} );
 
-    res.json(usuario);
+// CAMBIAR CONTRASEÑA
+router.put('/passwordchange',async(req, res = response) => {
+
+    //const { id } = req.params;
+    const {password, tokenId} = req.body;
+
+    if ( !password ) {return res.status(400).json({msg: 'El password no puede ser vacío1'});}
+    //encriptar password
+    const salt = bcryptjs.genSaltSync();
+    const NewPassword = bcryptjs.hashSync( password, salt );
+    
+
+    const  {uid}  = jwt.verify( tokenId, process.env.SECRETORPRIVATEKEY );
+    const user = await Usuario.findById(uid);
+    if ( !user ) { return res.status(400).json({ msg: 'No existe el usuario'});}
+
+    await Usuario.findByIdAndUpdate( uid, {password:NewPassword} );
+    const usuario = await Usuario.findById( uid );
+    res.json({usuario,msg:"se cambio la contraseña exitosamente"});
 } );
 
 // CREAR UN USUARIO NUEVO, SINGIN
@@ -84,9 +122,9 @@ router.post('/',[
     const usuario = new Usuario({ nombre, correo, password, rol });
     // Nombre no puede ser vacio
     if ( !nombre ) {return res.status(400).json({ msg: 'El nombre no puede ser vacío'});}
-     // Nombre no puede ser vacio
+     // password no puede ser vacio
     if ( !password ) {return res.status(400).json({msg: 'El password no puede ser vacío1'});}
-    // Nombre no puede ser vacio
+    // correo no puede ser vacio
     if ( !correo ) {return res.status(400).json({ msg: 'El correo no puede ser vacío'});}
     // Verificar si el usuario existe
     const user = await Usuario.findOne({ correo });
@@ -139,8 +177,8 @@ router.post('/login',[
         const validPassword = bcryptjs.compareSync( password, usuario.password );
         if ( !validPassword ) {return res.status(400).json({msg: 'Usuario o Password no son correctos'});}
         // Generar el JWT
-        const token = await generarJWT( usuario.id );
-        console.log("ok")
+        const token = await generarJWT( usuario._id );
+        console.log(usuario)
         res.json({
             usuario,
             token,
@@ -199,10 +237,11 @@ router.post('/google',[
     }
 } );
 
-// OBTENER ARRAY DE PRODUCTOS DE LA WISHLIST
+// GET ARRAY DE PRODUCTOS  WISHLIST
 router.get('/wishlist',validarJWT,async (req, res, next) => {
         // const { id } = req.params;
         // if(id){req.userId=id}
+        if(req.usuario.nombre==='invitado'){res.status(200).json([])}
     try {
         if(!req.usuario.wishList){const usuario = await Usuario.findByIdAndUpdate( req.userId, {wishList:[]})}
         

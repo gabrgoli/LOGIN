@@ -17,7 +17,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/500.css';
 import { useState } from 'react'
 import Cookie from 'js-cookie'
-
+import {v4 as uuid} from 'uuid'
 const categories=['https://res.cloudinary.com/dnlooxokf/image/upload/v1654579315/images/jwupcxolofvkyfzrdvin.png','https://res.cloudinary.com/dnlooxokf/image/upload/v1654579317/images/qgizpdigf71farfs88ae.png','https://res.cloudinary.com/dnlooxokf/image/upload/v1654579317/images/wgwbatmjliclmqek0k5r.png','https://res.cloudinary.com/dnlooxokf/image/upload/v1654579318/images/gstne4ffczw3e6zql5mh.png','https://res.cloudinary.com/dnlooxokf/image/upload/v1654579318/images/x35mc8bzxto8bf4mkclm.png','https://res.cloudinary.com/dnlooxokf/image/upload/v1654579318/images/s6wjxqzsxwcrvzua1oun.png','https://res.cloudinary.com/dnlooxokf/image/upload/v1654579319/images/ho68csnn5muuhecl33kj.png']
 //const categories=['https://i.pinimg.com/originals/9f/5d/34/9f5d34242941aa388fc3ec559501543c.gif']
 
@@ -58,7 +58,7 @@ const HomePage=({wishlist,setWishList})=>{
         <Container sx={{mt:12,minWidth:'100%',p:{xs:0}}}>
                 
                 <Box sx={{display:{md:'flex'}}}>
-                     <NavBar wishlist={wishlist} setWishList={setWishList}  sx={{display:{xs:'none',md:'flex'}}}/> 
+                     <NavBar  sx={{display:{xs:'none',md:'flex'}}}/> 
                 </Box>
                
         {productos[0]?
@@ -76,14 +76,14 @@ const HomePage=({wishlist,setWishList})=>{
                     loop
                 >
                     {categories.map(e=>
-                        <SwiperSlide key={e._id}>
+                        <SwiperSlide key={uuid()}>
                             <CardMedia
                             component="img"
                             height="auto"
                             image={e}
                             alt="gf"
                             sx={{objectFit:'contain'}}
-                            key={e._id}
+                            key={uuid()}
                             />
                         </SwiperSlide>)
                     }
@@ -100,10 +100,10 @@ const HomePage=({wishlist,setWishList})=>{
 
                 <Box>
 
-                    <Grid container   sx={{display:{md:'flex'},justifyContent:{xs:'space-around',md:'flex-start'},mt:2}}>  
+                    <Grid container   sx={{display:{md:'flex'},justifyContent:{xs:'space-around'},mt:2}}>  
                     {productos.filter((e)=>e.disponible===true).map(e=>// para no mostrar cuando el producto esta bloqueado       
-                    <Grid key={e._id} md={3} sx={{display:'flex',justifyContent:'center'}}>            
-                            <CardProduct key={e._id} product={e}  wishlist={wishlist} setWishList={setWishList}/>
+                    <Grid key={uuid()} sx={{display:'flex',justifyContent:'center'}}>            
+                            <CardProduct key={uuid()} product={e} />
                     </Grid>
                        )  
                     }

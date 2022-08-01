@@ -17,12 +17,13 @@ import { ADDTOWISHLIST,DELETEFROMWISHLIST,GETWISHLIST } from '../Redux/actions';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 
+
 //FUNCION PRINCIPAL
 export default function ProductCard({product}) {
   const [isHovered, setIsHovered] = useState (false);
   const [colorHeart, setColorHeart] = useState ();
   let userLogin=useSelector((state)=>state.rootReducer.usuario)
-  let wishList2=useSelector((state)=>state.rootReducer.wishList)
+  let wishList=useSelector((state)=>state.rootReducer.wishList)
   const navigate=useNavigate()
   const dispatch=useDispatch()
     const productImage = useMemo(()=>{
@@ -34,15 +35,17 @@ export default function ProductCard({product}) {
          
     },[isHovered,product.imageProduct])
 
+// PARA ESTABLECER LA VARIABLE GLOBAL wishList al cargar la página
+    React.useEffect(()=>{
+      dispatch(GETWISHLIST())
+    },[])
 
    // CUANDO CAMBIA LA WISHLIST, MAPEA TODOS LOS PRODUCTOS DE LA WISHLIST Y SI COINCIDE CON EL DE Peoducto PINTA DE ROJO EL CORAZÓN
    React.useEffect(()=>{
     setColorHeart(()=>'black')
-    //wishlist?.forEach((e)=>{
-      wishList2?.forEach((e)=>{
-      if(e._id===product._id)setColorHeart(()=>'red')
-    })
-    },[wishList2])
+    wishList?.forEach((e)=>{
+    if(e._id===product._id)setColorHeart(()=>'red')})
+    },[wishList])
 
     const addToWishList = () => { 
       if(colorHeart==="black"){
@@ -68,7 +71,7 @@ export default function ProductCard({product}) {
     onMouseEnter={()=> setIsHovered(true)}
     onMouseLeave={()=> setIsHovered(false)}
     >
-         {userLogin.length!==0&&<Tooltip title="Agregar a favoritos" placement="top">
+         {userLogin?.correo&&<Tooltip title="Agregar a favoritos" placement="top">
           <IconButton onClick={ addToWishList } style={{color: colorHeart}}>
             <FavoriteIcon />
           </IconButton>

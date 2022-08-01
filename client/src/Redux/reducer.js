@@ -46,6 +46,9 @@ const rootReducer = createReducer(initialState, (builder) => {
   .addCase(actions.USERISLOGIN.fulfilled, (state, action) => {
     state.usuario=action.payload
   })
+  .addCase(actions.LOGINUSER.fulfilled, (state, action) => {
+    state.usuario=action.payload
+  })
 
     .addCase(actions.GETPRODUCTS.fulfilled, (state, action) => {
       state.productos=[]

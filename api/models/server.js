@@ -1,21 +1,19 @@
 const express = require('express');
 const cors = require('cors');
-
+const morgan=require('morgan')
 const { dbConnection } = require('../database/config');
+
+const usuarios = require('../routes/usuarios')
+const productos = require('../routes/productos')
+const categorias = require('../routes/categorias')
+const buscar = require('../routes/buscar')
+
 
 class Server {
 
     constructor() {
         this.app  = express();
         this.port = process.env.PORT;
-
-        this.paths = {
-            buscar:     '/api/buscar',
-            categorias: '/api/categorias',
-            productos:  '/api/productos',
-            usuarios:   '/api/usuarios',
-        }
-
 
         // Conectar a base de datos
         this.conectarDB();
@@ -43,15 +41,17 @@ class Server {
         // Directorio Público
         this.app.use( express.static('public') );
 
+        // muestra las reutas cuando se hace un request
+        this.app.use(morgan('dev'));
+
     }
 
     routes() {
         
-        //this.app.use( this.paths.auth, require('../routes/auth'));
-        this.app.use( this.paths.buscar, require('../routes/buscar'));
-        this.app.use( this.paths.categorias, require('../routes/categorias'));
-        this.app.use( this.paths.productos, require('../routes/productos'));
-        this.app.use( this.paths.usuarios, require('../routes/usuarios'));
+        this.app.use( '/api/buscar', buscar);
+        this.app.use( '/api/categorias', categorias);
+        this.app.use( '/api/productos', productos);
+        this.app.use( '/api/usuarios', usuarios);
     }
 
     listen() {
