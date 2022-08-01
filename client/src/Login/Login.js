@@ -133,10 +133,12 @@ const LoginPage = () => {
             
                 {invalid && <Typography sx={{m:0,fontSize:{xs:10,sm:15},color:'red'}}>Usuario o contraseña incorrectos</Typography>}
                 
-                <TextField error={error} name='correo' label='Correo' variant="outlined" onChange={(e)=>handleChange(e)}  size='small' sx={{marginY:1,marginX:4}}></TextField>
+                <TextField error={error} name='correo' placeholder='Correo'  variant="outlined" onChange={(e)=>handleChange(e)}  size='small' sx={{marginY:1,marginX:4}}></TextField>
                 
                 <OutlinedInput 
                     id="outlined-adornment-password"
+                    label='Contraseña'
+                    placeholder='Contraseña'
                     endAdornment={
                     <InputAdornment position="end">
                         <IconButton
@@ -149,7 +151,7 @@ const LoginPage = () => {
                         </IconButton>
                     </InputAdornment>
                     }
-                    name='password' value={input.password} label='Contraseña' type={input.showPassword ? 'text' : 'password'} onChange={(e)=>handleChange(e)} variant="outlined"  size='small' sx={{marginY:1,marginX:4}}></OutlinedInput>
+                    name='password' value={input.password}  type={input.showPassword ? 'text' : 'password'} onChange={(e)=>handleChange(e)} variant="outlined"  size='small' sx={{marginY:1,marginX:4}}></OutlinedInput>
                 
                 <Button onClick={handleSubmit} type='submit' value='buscar' className='circular-btn' size='small' sx={{color:'white',marginY:1,marginX:4}}>
                         Ingresar
