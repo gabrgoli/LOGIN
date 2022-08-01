@@ -1,0 +1,1 @@
+ <img src="./foto.png" width="350" title="hover text">
