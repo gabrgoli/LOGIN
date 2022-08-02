@@ -99,11 +99,11 @@ router.put('/passwordchange',async(req, res = response) => {
 
     const  {uid}  = jwt.verify( tokenId, process.env.SECRETORPRIVATEKEY );
     const user = await Usuario.findById(uid);
-    if ( !user ) { return res.status(400).json({ msg: 'No existe el usuario'});}
+    if ( !user ) { return res.status(400).json({ msg: 'Token no válido'});}
 
     await Usuario.findByIdAndUpdate( uid, {password:NewPassword} );
     const usuario = await Usuario.findById( uid );
-    res.json({usuario,msg:"se cambio la contraseña exitosamente"});
+    res.json({usuario,msg:"se cambio la contraseña exitosamente!!!!         "});
 } );
 
 // CREAR UN USUARIO NUEVO, SINGIN
@@ -146,9 +146,9 @@ router.delete('/:id',[
     validarJWT,
      esAdminRole, //para que el usuario tiene que ser administrador
     //tieneRole('ADMIN_ROLE', 'VENTAR_ROLE','OTRO_ROLE'), //puede realizar la accion cualquiera con estos roles
-    check('id', 'No es un ID válido').isMongoId(),
-    check('id').custom( existeUsuarioPorId ),
-    validarCampos
+   // check('id', 'No es un ID válido').isMongoId(),
+   // check('id').custom( existeUsuarioPorId ),
+   // validarCampos
 ],usuariosDelete = async(req, res = response) => {
 
     const { id } = req.params;
@@ -160,14 +160,16 @@ router.delete('/:id',[
 
 // LOGIN DE USUARIO
 router.post('/login',[
-    check('correo', 'El correo es obligatorio').isEmail(),
-    check('password', 'La contraseña es obligatoria').not().isEmpty(),
-    validarCampos
+    //check('correo', 'El correo es obligatorio').isEmail(),
+    ///check('password', 'La contraseña es obligatoria').not().isEmpty(),
+    //validarCampos
 ],async(req, res = response) => {
 
     const { correo, password } = req.body;
-
     try {
+        if ( !correo ) {return res.status(400).json({ msg: 'El correo no puede estar vacío'});}
+        if ( !password ) {return res.status(400).json({ msg: 'El password no puede estar vacío'});}
+        
         const usuario = await Usuario.findOne({ correo });
         // Verificar si el usuario existe
         if ( !usuario ) {return res.status(400).json({ msg: 'No existe el usuario'});}
@@ -197,7 +199,7 @@ router.post('/login',[
 // LOGIN CON GOOGLE
 router.post('/google',[
    // check('id_token', 'El id_token es necesario').not().isEmpty(),
-    validarCampos
+    //validarCampos
 ], async(req, res = response) => {
     
     const { id_token } = req.body;
@@ -211,7 +213,7 @@ router.post('/google',[
             const data = {
                 nombre,
                 correo,
-                password: ':P',
+                password: 'SAPOPEPE',
                 img,
                 google: true
             };
@@ -219,10 +221,11 @@ router.post('/google',[
             //GUARDA EL USUARIO EN LA BASE DE DATOS
             await usuario.save();
         }
-        // Si el usuario esta Bloqueado
+        // SI USUARIO ESTA EN LA BDD
+        // Si esta Bloqueado
         if ( !usuario.estado ) { return res.status(401).json({msg: 'Hable con el administrador, usuario bloqueado'});}
         // Si esta todo OK, se genera el JWT
-        console.log("usuario",usuario)
+        //console.log("usuario",usuario)
         const token = await generarJWT( usuario._id );
         res.json({
             msg: "googleLogin Correcto",

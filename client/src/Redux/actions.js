@@ -171,7 +171,7 @@ export const MODIFYUSER=createAsyncThunk('MODIFYUSER',async (input)=>{
     }
 })
 
-//ENVIA MAIL DE CONFIRMACION
+//ENVIA MAIL DE CONFIRMACION                    
 export const SENDEMAIL=createAsyncThunk('SENDEMAIL',async (input)=>{
     try{
         const respuesta=await axios.post(`${api}/api/usuarios/enviomail`,input)

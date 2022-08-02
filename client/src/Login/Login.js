@@ -34,8 +34,8 @@ const LoginPage = () => {
     const handleChange=(e)=>{
         e.preventDefault();
         setError(()=>false)
-        const rgmail=/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
-        if(!rgmail.test(input.correo))setError(()=>true)
+        // const rgmail=/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+        // if(!rgmail.test(input.correo))setError(()=>true)
         setInput((prev) => ({...prev, [e.target.name]:e.target.value}))
 
     }
@@ -43,18 +43,10 @@ const LoginPage = () => {
 
     const handleSubmit= async (e)=>{
         e.preventDefault();
-        //try{
-            dispatch(LOGINUSER(input))
-            //const response=await axios.post(`${api}/api/usuarios/login`,input)
-           // if(response.data.msg==="login correcto ok"){
-                //var userObject = jwt_decode(response.data.token);
-                //console.log("userObject",userObject)
-               // Cookie.set('token',response.data.token)
-                //Cookie.set('user',JSON.stringify(response.data.usuario))
-                //dispatch(USERISLOGIN())
-                return swal({title:"Éxito",text:`Loin Exitoso`,icon:"success",button:"Aceptar"}).then(
-                    ()=>navigate("/home")
-                )
+        const rgmail=/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+        if(!rgmail.test(input.correo))setError(()=>true)
+        dispatch(LOGINUSER(input))
+        return swal({title:"Éxito",text:`Loin Exitoso`,icon:"success",button:"Aceptar"}).then(()=>navigate("/home"))
                
           /*  }
         }catch (e){
@@ -131,9 +123,9 @@ const LoginPage = () => {
                     sx={{objectFit:'contain'}}
                 />
             
-                {invalid && <Typography sx={{m:0,fontSize:{xs:10,sm:15},color:'red'}}>Usuario o contraseña incorrectos</Typography>}
+                {error && <Typography sx={{m:0,fontSize:{xs:10,sm:15},color:'red'}}>Usuario o contraseña incorrectos</Typography>}
                 
-                <TextField error={error} name='correo' placeholder='Correo'  variant="outlined" onChange={(e)=>handleChange(e)}  size='small' sx={{marginY:1,marginX:4}}></TextField>
+                <TextField autoFocus error={error} name='correo' placeholder='Correo'  variant="outlined" onChange={(e)=>handleChange(e)}  size='small' sx={{marginY:1,marginX:4}}></TextField>
                 
                 <OutlinedInput 
                     id="outlined-adornment-password"

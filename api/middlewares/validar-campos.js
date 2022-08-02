@@ -5,7 +5,9 @@ const validarCampos = ( req, res, next ) => {
 
     const errors = validationResult(req);
     if( !errors.isEmpty() ){
-        return res.status(400).json(errors);
+        console.log(errors[0].msg)
+        return res.status(400).json(errors[0].msg);
+
     }
 
     next();
