@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import { CardMedia, IconButton,Box,Divider } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import {useSelector,useDispatch} from 'react-redux'
@@ -12,18 +13,18 @@ import Badge from '@mui/material/Badge';
 import {v4 as uuid} from 'uuid'
 
 export default function BasicPopover() {
+  
   const [anchorEl, setAnchorEl] = React.useState(null);
+
   const dispatch=useDispatch()
   const navigate=useNavigate()
   let userLogin=useSelector((state)=>state.rootReducer.usuario)
   let wishlist2=useSelector((state)=>state.rootReducer.wishList)
 
   const deleteElement=(productId)=>{
-    //setWishList((old)=>old.filter((e)=>e._id!==productId))
-   // wishlist2.filter((e)=>e._id!==productId)
     dispatch(DELETEFROMWISHLIST({productId:productId}))
-    //dispatch(GETWISHLIST())
   }
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -34,11 +35,12 @@ export default function BasicPopover() {
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+
   return (
     <div>
-      <IconButton key={uuid()} aria-describedby={id} variant="contained" onClick={handleClick} style={{color: 'white'}}>
-        <Badge key={uuid()} badgeContent={wishlist2?.length} color="error">
-           <FavoriteIcon key={uuid()}/>
+      <IconButton  aria-describedby={id} variant="contained" onClick={handleClick} style={{color: 'white'}}>
+        <Badge  badgeContent={wishlist2?.length} color="error">
+           <FavoriteIcon/>
         </Badge>
       </IconButton>
       <Popover
@@ -49,11 +51,7 @@ export default function BasicPopover() {
         onClose={handleClose}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          horizontal: 'left',
         }}
       >
         {wishlist2&&wishlist2[0]? wishlist2?.map(product=>(
@@ -89,8 +87,7 @@ export default function BasicPopover() {
             <Typography key={uuid()} sx={{m:2,fontWeight:20}}>No tienes productos en favoritos</Typography>
             :  
             <Typography key={uuid()} sx={{m:2,fontWeight:20}}>Debes iniciar sesión para poder usar Favoritos</Typography>
-  
-          }
+            }
           </Box>
         
         }

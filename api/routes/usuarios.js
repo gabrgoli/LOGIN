@@ -88,23 +88,29 @@ router.put('/modificarusuario/:id',[
 // CAMBIAR CONTRASEÑA
 router.put('/passwordchange',async(req, res = response) => {
 
-    //const { id } = req.params;
-    const {password, tokenId} = req.body;
+        //const { id } = req.params;
+        const {password, tokenId} = req.body;
+    try{
+        if ( !password ) {return res.status(400).json({msg: 'El password no puede ser vacío'});}
+        //encriptar password
+        const salt = bcryptjs.genSaltSync();
+        const NewPassword = bcryptjs.hashSync( password, salt );
+        // desencriptar token y extraer el id de usuario
+        const  {uid}  = jwt.verify( tokenId, process.env.SECRETORPRIVATEKEY );
+        //buscar el usuario
+        const user = await Usuario.findById(uid);
+        //si no encuentra usuario
+        if ( !user ) { return res.status(400).json({ msg: 'Token no válido'});}
+        // si encuentra usuario, lo actualza y lo busca de nnuevo para traerlo actualizado
+        await Usuario.findByIdAndUpdate( uid, {password:NewPassword} );
+        const usuario = await Usuario.findById( uid );
 
-    if ( !password ) {return res.status(400).json({msg: 'El password no puede ser vacío1'});}
-    //encriptar password
-    const salt = bcryptjs.genSaltSync();
-    const NewPassword = bcryptjs.hashSync( password, salt );
-    
+        res.json({usuario,msg:"se cambio la contraseña exitosamente!!!!"});
+    }catch(error){
+        return res.status(400).json({ msg: 'Token no válido!!!!!'});
+    }
 
-    const  {uid}  = jwt.verify( tokenId, process.env.SECRETORPRIVATEKEY );
-    const user = await Usuario.findById(uid);
-    if ( !user ) { return res.status(400).json({ msg: 'Token no válido'});}
-
-    await Usuario.findByIdAndUpdate( uid, {password:NewPassword} );
-    const usuario = await Usuario.findById( uid );
-    res.json({usuario,msg:"se cambio la contraseña exitosamente!!!!         "});
-} );
+})
 
 // CREAR UN USUARIO NUEVO, SINGIN
 router.post('/',[
