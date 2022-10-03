@@ -21,7 +21,6 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
 }
 
 .App-link {
@@ -35,4 +34,41 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+.loginButton{
+width: 100%;
+  padding: 13px 25px;
+  border-radius: 5px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  cursor: pointer;
+
+  margin-top: 10px;
+  margin-left: 34px;
+  margin-right: 34px
+}
+
+.icon{
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.facebook{
+  background-color: #507cc0;
+}
+.github{
+  background-color: black;
+}
+
+.instagram{
+  background-color: #b10d99;
+}
+.paypal{
+  background-color: #093982;
 }

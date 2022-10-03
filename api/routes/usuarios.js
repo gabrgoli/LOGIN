@@ -12,9 +12,51 @@ const { googleVerify } = require('../helpers/google-verify');
 const emailer = require("../nodeMailer/emailer")
 const jwt = require('jsonwebtoken');
 
+const passport = require('passport')
+
 //const { usuariosGet,usuariosPut, signIn, usuariosDelete,usuariosPatch, login, googleSignin,getWishlist, addProductToWishlist,deleteProductToWishlist, getusuariobytoken,} = require('../controllers/usuarios');
 
 const router = Router();
+
+
+
+//
+
+router.get("/login/success", (req, res) => {
+    if (req.user) {
+      res.status(200).json({
+        success: true,
+        message: "successfull",
+        user: req.user,
+           cookies: req.cookies
+      });
+    }
+  });
+
+
+router.get("/github", passport.authenticate("github", { scope: ["accessToken"] }));
+router.get("/github/callback",passport.authenticate("github", {
+    successRedirect: `http://localhost:3000/home`,
+    failureRedirect: "http://localhost:3000/",
+  })
+);
+
+router.get("/facebook", passport.authenticate("facebook", { scope: ["profile"] }));
+router.get("/facebook/callback",passport.authenticate("facebook", {
+    successRedirect: `http://localhost:3000/home`,
+    failureRedirect: "/login/failed",
+  })
+);
+
+router.get("/instagram", passport.authenticate("instagram"));
+router.get("/instagram/callback",passport.authenticate("instagram",{
+    successRedirect: `http://localhost:3002/home`,
+    failureRedirect: "http://localhost:3002/",
+})
+);
+
+
+
 
 // TRAER TODOS LOS USUARIOS
 router.get('/', [validarJWT,esAdminRole],async(req = request, res = response) => {
@@ -112,7 +154,7 @@ router.put('/passwordchange',async(req, res = response) => {
 
 })
 
-// CREAR UN USUARIO NUEVO, SINGIN
+// CREAR UN NUEVO USUARIO , SINGIN
 router.post('/',[
     //check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     //check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),

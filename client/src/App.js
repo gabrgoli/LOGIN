@@ -30,12 +30,6 @@ function App() {
   const dispatch=useDispatch()
   //const isLogged=Cookie.get('user')&&JSON.parse(Cookie.get('user')).correo?true:false
   
-  // useEffect(()=>{
-  //  // console.log("se hicieron los dispatch del App.js")
-  //   //dispatch(USERISLOGIN())
-  //   //dispatch(GETWISHLIST())
-  // },[])
-
   let userLogin=useSelector((state)=>state.rootReducer.usuario)
   console.log("userLogin",userLogin)
  // console.log('wishlist APP',wishlist)

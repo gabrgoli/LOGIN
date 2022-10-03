@@ -1,4 +1,4 @@
-import { Box,Divider, Typography, TextField, Button,FormControl,Container ,CardMedia,InputAdornment,OutlinedInput} from '@mui/material';
+import { Box,Divider, Typography, TextField, Button,FormControl,Container ,CardMedia,InputAdornment,OutlinedInput, Input, InputLabel} from '@mui/material';
 import {Link} from 'react-router-dom'
 import { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -15,11 +15,57 @@ import swal from 'sweetalert';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Facebook from "../img/facebook.png";
+import Github from "../img/github.png";
+import Instagram from "../img/instagram.png";
 
 export const api=process.env.REACT_APP_URL_BACKEND||'http://localhost:8080'
 
 
 const LoginPage = () => {
+
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+      const getUser = () => {
+        fetch("http://localhost:8080/api/usuarios/login/success", {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Credentials": true,
+          },
+        })
+          .then((response) => {
+            if (response.status === 200) return response.json();
+            throw new Error("authentication has been failed!");
+          })
+          .then((resObject) => {
+            setUser(resObject.user);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      };
+      getUser();
+    }, []);
+  
+console.log('usuario',user)
+
+
+    const github = () => {
+        window.open("http://localhost:8080/api/usuarios/github", "_self");
+      };
+    
+      const facebook = () => { 
+        window.open("http://localhost:8080/api/usuarios/facebook", "_self");
+      };
+    
+      const instagram = () => { 
+        window.open("http://localhost:8080/api/usuarios/instagram", "_self");
+      };
+
 
     const useAppDispatch = () => useDispatch();
     const dispatch=useAppDispatch()
@@ -90,8 +136,6 @@ const LoginPage = () => {
             console.log("res",res.response.data.msg)
             return swal({title:"Error",text:`${res.response.data.msg}`,icon:"error",button:"Aceptar"})
         }
-
-
       } 
 
     useEffect(()=>{
@@ -125,12 +169,27 @@ const LoginPage = () => {
             
                 {error && <Typography sx={{m:0,fontSize:{xs:10,sm:15},color:'red'}}>Usuario o contraseña incorrectos</Typography>}
                 
-                <TextField autoFocus error={error} name='correo' placeholder='Correo'  variant="outlined" onChange={(e)=>handleChange(e)}  size='small' sx={{marginY:1,marginX:4}}></TextField>
-                
+                <TextField 
+                id="filled-size-normal"
+              //  variant="filled" 
+                label='correo'
+                autoFocus error={error} 
+                name='correo' 
+                //placeholder='Correo'  
+                onChange={(e)=>handleChange(e)}  
+                size='small' 
+                sx={{marginY:1,marginX:4}}>
+
+                </TextField>
+
+
+              
+        
                 <OutlinedInput 
                     id="outlined-adornment-password"
-                    label='Contraseña'
-                    placeholder='Contraseña'
+                    //variant='filled'
+                    
+                    //placeholder='Contraseña'
                     endAdornment={
                     <InputAdornment position="end">
                         <IconButton
@@ -139,12 +198,18 @@ const LoginPage = () => {
                         onMouseDown={handleMouseDownPassword}
                         edge="end"
                         >
+                          
                         {input.showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
+                       
                     </InputAdornment>
                     }
-                    name='password' value={input.password}  type={input.showPassword ? 'text' : 'password'} onChange={(e)=>handleChange(e)} variant="outlined"  size='small' sx={{marginY:1,marginX:4}}></OutlinedInput>
-                
+                    name='password' value={input.password} label='hola'  type={input.showPassword ? 'text' : 'password'} onChange={(e)=>handleChange(e)}  size='small' sx={{marginY:2,marginX:4}}>
+
+                </OutlinedInput>
+        
+
+
                 <Button onClick={handleSubmit} type='submit' value='buscar' className='circular-btn' size='small' sx={{color:'white',marginY:1,marginX:4}}>
                         Ingresar
                 </Button>
@@ -159,7 +224,35 @@ const LoginPage = () => {
                     <h3>Google Signin</h3>
                     <div id="signInDiv"></div>
                 </Box>
+                <Box display='flex' justifyContent="center">
+    
+                    <div className="loginButton facebook" onClick={facebook} >
+                        <img src={Facebook} alt="" className="icon" />
+                        Facebook
+                    </div>
+                </Box>
 
+                    <Box display='flex' justifyContent="center"  >
+                        <div className="loginButton paypal" onClick={github} >
+                            <img src={Github} alt="" className="icon" />
+                            Paypal
+                        </div>
+                    </Box>
+
+                    
+                    <Box display='flex' justifyContent="center"  >
+                        <div className="loginButton instagram" onClick={instagram} >
+                            <img src={Instagram} alt="" className="icon" />
+                            Instagram
+                        </div>
+                    </Box>
+
+                    <Box display='flex' justifyContent="center"  >
+                        <div className="loginButton github" onClick={github} >
+                            <img src={Github} alt="" className="icon" />
+                            Github
+                        </div>
+                    </Box>
 
                 <Divider >o</Divider>
                 
@@ -167,6 +260,8 @@ const LoginPage = () => {
                 <Typography sx={{marginBottom:1,marginX:4}} color='black' fontSize={14} >No tienes cuenta? <Link to='/signup'>Crear</Link></Typography>
             </Box>
         </Box>
+
+
         </form>
     )
 }
